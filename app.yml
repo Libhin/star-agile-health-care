@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capstone-app-deployment
+  labels:
+    app: capstone-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: capstone-app
+  template:
+    metadata:
+      labels:
+        app: capstone-app
+    spec:
+      containers:
+        - name: capstone-app-container
+          image: langit/capstone:2.1
+          ports:
+            - containerPort: 8080   # Replace with the actual container port your app uses
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: capstone-app-service
+spec:
+  type: Node
