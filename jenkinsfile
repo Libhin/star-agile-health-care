@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "capstu:v1"
+        DOCKER_REPO = "dockerhub-username/repo-name"  // Replace with your Docker Hub username and repo
+        TERRAFORM_WORKSPACE = "test"
+    }
+
+    stages {
+        // Clone the project repository
+        stage('Checkout Project') {
+            steps {
+                git 'https://github.com/Laxte/star-agile-malth-care-CAP.git'
+            }
+        }
+
+        // Build the Docker image
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_REPO}:${DOCKER_IMAGE} ."
+                }
+            }
+        }
+
+        // Push the Docker image to Docker Hub
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    sh "docker push ${DOCKER_REPO}:${DOCKER_IMAGE}"
+                }
+            }
+        }
+
+        // Select the Terraform workspace
+        stage('Terraform Workspace Operations') {
+            steps {
+                script {
+                    sh """
+                        terraform workspace select ${TERRAFORM_WORKSPACE} || terraform workspace new ${TERRAFORM_WORKSPACE}
+                    """
+                }
+            }
+        }
+
+        // Terraform plan step
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    sh 'terraform plan'
+                }
+            }
+        }
+
+        // Terraform Apply (or Destroy)
+        stage('Terraform Apply / Destroy') {
+            steps {
+                script {
+                    sh 'terraform apply -auto-approve'  // Use terraform destroy if you want to destroy infrastructure
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup or notifications can be done here
+            echo 'Pipeline finished.'
+        }
+    }
+}
