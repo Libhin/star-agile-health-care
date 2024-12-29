@@ -1,0 +1,9 @@
+<testng>
+  <suite name="Insurance Suite">
+    <test name="Policy Tests">
+      <classes>
+        <class name="com.example.PolicyServiceTest" />
+      </classes>
+    </test>
+  </suite>
+</testng>
